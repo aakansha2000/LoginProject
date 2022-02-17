@@ -16,6 +16,7 @@ class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
     private lateinit var viewModel: LoginViewModel
+    private lateinit var homeFragment: HomeFragment
 
 
     override fun onCreateView(
@@ -24,7 +25,7 @@ class LoginFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
-
+        homeFragment = HomeFragment()
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_login,
@@ -32,28 +33,22 @@ class LoginFragment : Fragment() {
             false
         )
 
-        binding.loginBtn.setOnClickListener { checkUserEmail() }
+        binding.loginBtn.setOnClickListener {
+            viewModel.username = binding.userName.text.toString()
+            var value = viewModel.checkUserEmail()
+            if (value) {
+                Toast.makeText(activity, "Email  verified", Toast.LENGTH_SHORT).show()
+                activity?.supportFragmentManager?.beginTransaction()?.apply {
+                    replace(R.id.fragment_container,homeFragment)
+                    commit()
+                }
+            } else {
+                Toast.makeText(activity, "Email not verified", Toast.LENGTH_SHORT).show()
+
+            }
+        }
 
         return binding.root
-    }
-
-    private fun checkUserEmail() {
-        val emailToText: String = etMail.getText().toString()
-
-        // Android offers the inbuilt patterns which the entered
-        // data from the EditText field needs to be compared with
-        // In this case the the entered data needs to compared with
-        // the EMAIL_ADDRESS, which is implemented same below
-
-        // Android offers the inbuilt patterns which the entered
-        // data from the EditText field needs to be compared with
-        // In this case the the entered data needs to compared with
-        // the EMAIL_ADDRESS, which is implemented same below
-        if (!emailToText.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(emailToText).matches()) {
-            Toast.makeText(this, "Email Verified !", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Enter valid Email address !", Toast.LENGTH_SHORT).show()
-        }
     }
 
 
